@@ -95,7 +95,7 @@ You should see `jarvis` in the autocomplete list.
 ls -la ~/.claude/jarvis/skill/SKILL.md
 
 # If missing, re-run installer
-curl -sSL https://raw.githubusercontent.com/andrey-shilin-parloa/jarvis-starter/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/Andy-ai-git/Jarvis-PM/main/install.sh | bash
 ```
 
 ### `/jarvis` appears but doesn't activate properly

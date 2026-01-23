@@ -181,7 +181,7 @@ Example:
 
 ## Standards
 
-- All PRDs use the Parloa template
+- All PRDs use the company template
 - Security review required for user data changes
 - Design review required for UI changes
 ```

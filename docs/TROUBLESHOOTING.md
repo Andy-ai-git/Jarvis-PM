@@ -291,7 +291,7 @@ mv ~/jarvis-memory-backup ~/.claude/jarvis/memory
 
 If none of these solutions work:
 
-1. **Check the GitHub issues:** [jarvis-starter issues](https://github.com/andrey-shilin-parloa/jarvis-starter/issues)
+1. **Check the GitHub issues:** [Jarvis-PM issues](https://github.com/Andy-ai-git/Jarvis-PM/issues)
 2. **Open a new issue** with:
    - What you tried
    - Error messages (if any)

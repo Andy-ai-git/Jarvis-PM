@@ -1,13 +1,12 @@
 #!/bin/bash
 # Jarvis OS Installer
-# From: jarvis-starter repo
-# Installs: jarvis-os-for-PMs (core system)
+# Self-contained installation from single repo
 
 set -e
 
 JARVIS_DIR="$HOME/.claude/jarvis"
-CORE_REPO="https://github.com/andrey-shilin-parloa/jarvis-os-for-PMs.git"
-STARTER_REPO="https://raw.githubusercontent.com/Andy-ai-git/Jarvis-PM/main"
+REPO_URL="https://github.com/Andy-ai-git/Jarvis-PM.git"
+RAW_URL="https://raw.githubusercontent.com/Andy-ai-git/Jarvis-PM/main"
 
 echo ""
 echo "╔═══════════════════════════════════════╗"
@@ -30,7 +29,7 @@ if [ ! -d "$HOME/.claude" ]; then
   echo "✓ Created ~/.claude"
 fi
 
-# Clone or update core system
+# Clone or update Jarvis
 if [ -d "$JARVIS_DIR/.git" ]; then
   echo "→ Updating existing installation..."
   cd "$JARVIS_DIR" && git pull --quiet
@@ -41,8 +40,8 @@ else
     echo "   Backing up to ~/.claude/jarvis.backup..."
     mv "$JARVIS_DIR" "$HOME/.claude/jarvis.backup.$(date +%Y%m%d%H%M%S)"
   fi
-  echo "→ Installing Jarvis OS core..."
-  git clone --quiet "$CORE_REPO" "$JARVIS_DIR"
+  echo "→ Installing Jarvis OS..."
+  git clone --quiet "$REPO_URL" "$JARVIS_DIR"
   echo "✓ Cloned to $JARVIS_DIR"
 fi
 
@@ -52,11 +51,15 @@ mkdir -p "$JARVIS_DIR/memory/daily-notes"
 mkdir -p "$JARVIS_DIR/context"
 echo "✓ Directories created"
 
-# Download minimal profile from starter repo
+# Set up starter profile
 echo "→ Setting up starter profile..."
 if [ ! -f "$JARVIS_DIR/memory/user-profile.md" ]; then
-  curl -sSL "$STARTER_REPO/starter-templates/user-profile-minimal.md" \
-    -o "$JARVIS_DIR/memory/user-profile.md"
+  if [ -f "$JARVIS_DIR/starter-templates/user-profile-minimal.md" ]; then
+    cp "$JARVIS_DIR/starter-templates/user-profile-minimal.md" "$JARVIS_DIR/memory/user-profile.md"
+  else
+    curl -sSL "$RAW_URL/starter-templates/user-profile-minimal.md" \
+      -o "$JARVIS_DIR/memory/user-profile.md"
+  fi
   echo "✓ Created user-profile.md (minimal starter)"
 else
   echo "✓ user-profile.md already exists (preserved)"
