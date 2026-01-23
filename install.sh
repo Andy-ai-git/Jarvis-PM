@@ -7,7 +7,7 @@ set -e
 
 JARVIS_DIR="$HOME/.claude/jarvis"
 CORE_REPO="https://github.com/andrey-shilin-parloa/jarvis-os-for-PMs.git"
-STARTER_REPO="https://raw.githubusercontent.com/andrey-shilin-parloa/jarvis-starter/main"
+STARTER_REPO="https://raw.githubusercontent.com/Andy-ai-git/Jarvis-PM/main"
 
 echo ""
 echo "╔═══════════════════════════════════════╗"

@@ -7,7 +7,7 @@ Get Jarvis running in 5 minutes.
 ## Step 1: Install (1 minute)
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/andrey-shilin-parloa/jarvis-starter/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/Andy-ai-git/Jarvis-PM/main/install.sh | bash
 ```
 
 You should see:

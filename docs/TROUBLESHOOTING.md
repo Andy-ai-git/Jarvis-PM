@@ -37,7 +37,7 @@ ls -la ~/.claude/jarvis/skill/SKILL.md
 
 # If file exists, restart Claude Code
 # If file missing, re-run installer:
-curl -sSL https://raw.githubusercontent.com/andrey-shilin-parloa/jarvis-starter/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/Andy-ai-git/Jarvis-PM/main/install.sh | bash
 ```
 
 ### "Permission denied" during installation
@@ -268,7 +268,7 @@ rm -rf ~/.claude/jarvis
 ### Fresh reinstall
 ```bash
 rm -rf ~/.claude/jarvis
-curl -sSL https://raw.githubusercontent.com/andrey-shilin-parloa/jarvis-starter/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/Andy-ai-git/Jarvis-PM/main/install.sh | bash
 ```
 
 ### Reinstall keeping profile
@@ -278,7 +278,7 @@ cp -r ~/.claude/jarvis/memory ~/jarvis-memory-backup
 
 # Reinstall
 rm -rf ~/.claude/jarvis
-curl -sSL https://raw.githubusercontent.com/andrey-shilin-parloa/jarvis-starter/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/Andy-ai-git/Jarvis-PM/main/install.sh | bash
 
 # Restore memory
 rm -rf ~/.claude/jarvis/memory
