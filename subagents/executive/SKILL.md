@@ -1,3 +1,9 @@
+---
+agent_id: executive
+agent_type: reviewer
+description: Evaluate strategic alignment, stakeholder clarity, competitive positioning, and business case strength.
+---
+
 # Executive Review Subagent
 
 ## Purpose

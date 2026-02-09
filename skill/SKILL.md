@@ -47,6 +47,18 @@ USER_MEMORY="$HOME/.claude/jarvis/memory"
 # - learnings.md: Decision patterns, corrections, effective approaches
 # - cross-project-knowledge.md: Company context, stakeholders
 # - daily-notes/[last 3 days]: Recent session context (minimal load)
+# - session-log.jsonl: Recent events (last 7 days, filtered)
+```
+
+**Session Log (Recent Events - Context Efficient):**
+```bash
+# Load last 7 days of decisions, blockers, pending actions
+# Max 20 events to stay context-efficient
+SESSION_LOG="$USER_MEMORY/session-log.jsonl"
+CUTOFF=$(date -v-7d +%Y-%m-%dT00:00:00Z)
+# Filter: last 7 days, relevant types, current project or cross-project
+jq -c "select(.ts >= \"$CUTOFF\" and .type | IN(\"decision\",\"blocker\",\"action\"))" \
+  "$SESSION_LOG" | tail -20
 ```
 
 **Daily Notes (Last 3 Days - Context Efficient):**
@@ -135,6 +147,7 @@ Memory loaded:
 • User profile: [X] preferences
 • Project cache: [Y] documents
 • Subagent outputs: [Z] analyses
+• Recent events: [N] items ([D] decisions, [B] blockers, [A] pending actions)
 
 Ready for: fact checks, reviews, strategic questions
 ```
@@ -292,6 +305,11 @@ When asked about something not in cache:
 |---------|--------|
 | `/jarvis` | Activate/re-activate |
 | `jarvis status` | Show cached docs, metrics |
+| `jarvis events` | Show recent events (last 7 days) |
+| `jarvis events --all` | Show all events for current project |
+| `jarvis blockers` | Show active blockers |
+| `jarvis actions` | Show pending actions |
+| `jarvis log [type]: [text]` | Manually log event (decision/blocker/action/insight) |
 | `jarvis projects` | List all projects |
 | `jarvis memory` | Show user memory contents |
 | `jarvis learn [fact]` | Add to learnings.md |
@@ -310,6 +328,8 @@ When asked about something not in cache:
 │   ├── user-profile.md             # Identity, preferences
 │   ├── learnings.md                # Patterns, corrections
 │   ├── cross-project-knowledge.md  # Company facts
+│   ├── session-log.jsonl           # Structured events (decisions, blockers, actions)
+│   ├── session-log-archive/        # Archived events (quarterly)
 │   └── daily-notes/                # Session summaries by date
 │       └── YYYY-MM-DD.md           # Load last 3 days (~50 lines max)
 │
@@ -339,6 +359,10 @@ When asked about something not in cache:
 | User corrects Jarvis | `memory/learnings.md` |
 | New preference discovered | `memory/user-profile.md` |
 | Cross-project fact learned | `memory/cross-project-knowledge.md` |
+| **Decision made** | `memory/session-log.jsonl` |
+| **Blocker identified** | `memory/session-log.jsonl` |
+| **Action item created** | `memory/session-log.jsonl` |
+| **Insight recorded** | `memory/session-log.jsonl` |
 | **Session ends** | `memory/daily-notes/YYYY-MM-DD.md` |
 | Document cached | `context/[project]/drive-docs/` |
 | Subagent analysis complete | `context/[project]/analysis-outputs/` |
@@ -365,6 +389,64 @@ At end of session (or when user says "add today's notes"), write to `memory/dail
 ```
 
 **Retention:** Keep last 30 days, auto-prune older notes.
+
+### Session Event Log (session-log.jsonl)
+
+Structured event log for machine-readable persistence across sessions. JSONL format (one event per line).
+
+**Schema (v1):**
+```json
+{
+  "v": 1,
+  "ts": "ISO8601 timestamp",
+  "type": "decision|blocker|action|learning|insight|milestone|context",
+  "project": "project-slug or null (cross-project)",
+  "content": "Event description",
+  "context": "Optional reasoning/background",
+  "owner": "For blockers/actions: person responsible",
+  "status": "For actions: pending|done|cancelled",
+  "tags": ["optional", "categorization", "tags"]
+}
+```
+
+**Event Types:**
+
+| Type | Description | Auto-Extract Triggers |
+|------|-------------|----------------------|
+| `decision` | A choice was made | "decided", "agreed", "we'll go with", "final answer" |
+| `blocker` | Something blocking progress | "blocked", "waiting on", "need input from", "can't proceed" |
+| `action` | Follow-up task identified | "need to", "TODO", "follow up", "next step", "tomorrow" |
+| `learning` | Reusable knowledge gained | "actually", "turns out", "TIL", "learned that" |
+| `insight` | Non-obvious observation | "hypothesis", "noticed", "pattern", "interesting" |
+| `milestone` | Significant completion | "done", "shipped", "completed", "launched" |
+| `context` | Important background info | Explicit "for context", "background", "FYI" |
+
+**Auto-Extraction:**
+Jarvis automatically detects and logs events during conversation based on trigger phrases. Events are written immediately when detected.
+
+**Manual Commands:**
+- `jarvis log decision: [text]` - Force-write decision event
+- `jarvis log blocker: [text]` - Force-write blocker event
+- `jarvis log action: [text]` - Force-write action event
+- `jarvis log insight: [text]` - Force-write insight event
+
+**Loading (On Activation):**
+- Load last 7 days of events
+- Filter to: decisions, blockers, pending actions
+- Max 20 events to stay context-efficient
+- Estimated cost: ~500-1000 tokens
+
+**Retention:**
+- Active: 90 days in `session-log.jsonl`
+- Archive: Quarterly files in `session-log-archive/` (e.g., `2026-Q1.jsonl`)
+- Auto-cleanup on `/jarvis` activation
+
+**Example Entries:**
+```jsonl
+{"v":1,"ts":"2026-02-03T14:30:00Z","type":"decision","project":"my-project","content":"Agreed to use microservices architecture","tags":["architecture"]}
+{"v":1,"ts":"2026-02-03T15:00:00Z","type":"blocker","project":"my-project","content":"Need API contract from partner team","owner":"Partner Team"}
+{"v":1,"ts":"2026-02-03T15:30:00Z","type":"action","project":"my-project","content":"Draft technical spec","status":"done"}
+```
 
 ---
 

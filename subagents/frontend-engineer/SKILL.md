@@ -1,3 +1,9 @@
+---
+agent_id: frontend-engineer
+agent_type: reviewer
+description: Evaluate UI implementation feasibility, component architecture, state management, and frontend best practices.
+---
+
 # Frontend Engineer Review Subagent
 
 ## Purpose

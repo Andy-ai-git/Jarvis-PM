@@ -1,3 +1,9 @@
+---
+agent_id: devops
+agent_type: reviewer
+description: Evaluate infrastructure, deployment pipelines, monitoring, security, and operational readiness.
+---
+
 # DevOps Engineer Review Subagent
 
 ## Purpose

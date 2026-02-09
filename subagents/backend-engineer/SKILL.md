@@ -1,3 +1,9 @@
+---
+agent_id: backend-engineer
+agent_type: reviewer
+description: Evaluate API design, service architecture, database schemas, performance, security, and backend implementation.
+---
+
 # Backend Engineer Review Subagent
 
 ## Purpose

@@ -1,3 +1,9 @@
+---
+agent_id: marketer
+agent_type: reviewer
+description: Evaluate positioning, messaging clarity, competitive differentiation, and go-to-market readiness.
+---
+
 # Marketer Review Subagent
 
 ## Purpose

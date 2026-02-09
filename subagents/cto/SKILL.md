@@ -1,3 +1,9 @@
+---
+agent_id: cto
+agent_type: reviewer
+description: Evaluate technical strategy, architecture decisions, build-vs-buy trade-offs, and platform implications.
+---
+
 # CTO Review Subagent
 
 ## Purpose

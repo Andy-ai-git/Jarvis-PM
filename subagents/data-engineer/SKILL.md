@@ -1,3 +1,9 @@
+---
+agent_id: data-engineer
+agent_type: reviewer
+description: Evaluate data pipelines, ETL processes, data warehouse design, and analytics infrastructure.
+---
+
 # Data Engineer Review Subagent
 
 ## Purpose

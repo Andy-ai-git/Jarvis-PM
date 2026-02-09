@@ -1,3 +1,9 @@
+---
+agent_id: data-analyst
+agent_type: reviewer
+description: Validate metrics definitions, assess success criteria quality, and evaluate measurement feasibility.
+---
+
 # Data Analyst Review Subagent
 
 ## Purpose

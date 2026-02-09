@@ -1,3 +1,9 @@
+---
+agent_id: user-researcher
+agent_type: reviewer
+description: Validate user value, assess pain point alignment, and evaluate assumptions about user behavior.
+---
+
 # User Researcher Review Subagent
 
 ## Purpose

@@ -1,3 +1,9 @@
+---
+agent_id: ux-designer
+agent_type: reviewer
+description: Evaluate user experience, interaction design, usability, and design system alignment.
+---
+
 # UX Designer Review Subagent
 
 ## Purpose
