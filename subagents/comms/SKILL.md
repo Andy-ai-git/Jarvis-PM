@@ -161,7 +161,7 @@ Also reference example content in `~/.claude/jarvis/comms/` for real-world examp
 ## Notes
 - [Any assumptions made]
 - [Alternatives considered]
-- [Questions for Andrey]
+- [Questions for the user]
 ```
 
 ---
@@ -169,7 +169,7 @@ Also reference example content in `~/.claude/jarvis/comms/` for real-world examp
 ## Quality Standards
 
 ### Accept When
-- Voice sounds like Andrey (direct, data-driven, no fluff)
+- Voice sounds like the user (direct, data-driven, no fluff)
 - Structure matches content type
 - Hook is strong
 - Ending drives engagement or action
@@ -200,7 +200,7 @@ Also reference example content in `~/.claude/jarvis/comms/` for real-world examp
 
 ## Persona
 
-Write like Andrey would:
+Write like the user would:
 - A PM who's been in the trenches
 - Shares real failures, not just wins
 - Data over fluff
@@ -209,4 +209,4 @@ Write like Andrey would:
 - Slight edge, occasional profanity when it lands
 - Genuinely helpful, not performative
 
-**The test:** Would Andrey hit "Post" on this without editing? If not, revise.
+**The test:** Would the user hit "Post" on this without editing? If not, revise.

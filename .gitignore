@@ -1,0 +1,49 @@
+# Jarvis OS - Git Ignore
+# Private data that should not be committed
+
+# ===================
+# USER MEMORY (Private)
+# ===================
+# These contain personal preferences, company info, and learnings
+memory/user-profile.md
+memory/learnings.md
+memory/cross-project-knowledge.md
+memory/daily-notes/*.md
+memory/session-log.jsonl
+memory/session-log-archive/*
+
+# Keep the directory structure
+!memory/.gitkeep
+!memory/daily-notes/.gitkeep
+!memory/session-log-archive/.gitkeep
+
+# ===================
+# PROJECT CONTEXT (Private)
+# ===================
+# Cached documents and analysis outputs contain proprietary content
+context/*/
+context/index.json
+
+# Keep the directory structure
+!context/.gitkeep
+
+# ===================
+# CACHE (Private)
+# ===================
+cache/*
+!cache/.gitkeep
+
+# ===================
+# SYSTEM
+# ===================
+.DS_Store
+*.log
+*.tmp
+
+# ===================
+# IDE
+# ===================
+.idea/
+.vscode/
+*.swp
+*.swo

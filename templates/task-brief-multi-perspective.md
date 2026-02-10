@@ -18,6 +18,9 @@ Comprehensive review of **[DOCUMENT_NAME]** from technical, strategic, and user 
 ## Context Summary
 [2-3 sentences: What document? What decision? Why multi-perspective review?]
 
+## Thinking Level
+Use "ultrathink" for this comprehensive review. Multi-perspective analysis requires deep reasoning to identify conflicts and synthesize across lenses.
+
 ## Review Instructions
 
 ### Engineer Focus

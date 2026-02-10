@@ -18,6 +18,9 @@ Review **[PRD_NAME]** for technical feasibility, strategic alignment, and user v
 ## Context Summary
 [2-3 sentences of background: What is this PRD about? What phase? What's the decision at hand?]
 
+## Thinking Level
+Use extended thinking ("think hard") for this review. Escalate to "ultrathink" if complex architectural trade-offs are involved.
+
 ## Specific Questions to Answer
 1. Is this technically feasible within the stated timeline?
 2. Are all dependencies identified and owners assigned?

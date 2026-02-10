@@ -18,6 +18,9 @@ Review **[PRFAQ_NAME]** for stakeholder clarity, strategic fit, and customer val
 ## Context Summary
 [2-3 sentences: What product/feature? What stage (draft, final)? Who is the audience?]
 
+## Thinking Level
+Use extended thinking ("think hard") for this review. Strategic positioning and competitive dynamics benefit from deeper reasoning.
+
 ## Specific Questions to Answer
 1. Is the customer problem clear and compelling?
 2. Does the solution differentiate from alternatives?

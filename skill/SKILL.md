@@ -100,6 +100,8 @@ fi
 
 ### 5. Proactive Caching (If .jarvis.md exists)
 
+#### 5a. Drive Documents
+
 For each document in Critical Documents table:
 
 1. **Check cache status** in `index.json`
@@ -109,6 +111,37 @@ For each document in Critical Documents table:
    - Save to `drive-docs/[doc-name].md`
    - Update `index.json` status
 
+#### 5b. Notion Pages (NEW)
+
+For each page in Key Notion Pages table:
+
+1. **Check cache status** in `index.json`
+2. **If not cached or stale (>30 days):**
+   - Fetch with `notion-fetch` tool
+   - Create Level 1 summary with metadata
+   - Save to `notion-pages/[page-name].md`
+   - Update `index.json` status
+
+**Notion Cache File Format:**
+```markdown
+# [Page Title] - Cached Summary
+
+## Metadata (Level 0)
+| Field | Value |
+|-------|-------|
+| Page ID | `...` |
+| URL | `...` |
+| Last Modified | ... |
+| Cache Level | 1 |
+
+## Key Facts (Level 1 Summary)
+- [Extracted key facts]
+- [Quick answers]
+
+---
+*To fetch full page: Use Notion ID `...`*
+```
+
 **Tiered Cache Levels:**
 ```
 Level 0: Metadata only        (~50 tokens)   - title, date, size, ID
@@ -116,12 +149,13 @@ Level 1: Key facts summary    (~500 tokens)  - extracted insights, quick answers
 Level 2: Full document        (on demand)    - fetched when Level 1 insufficient
 ```
 
-**Cache File Format:**
+**Cache File Format (Drive):**
 ```markdown
 # [Document Title] - Cached Summary
 
 ## Metadata (Level 0)
 | Field | Value |
+|-------|-------|
 | Document ID | `...` |
 | Last Modified | ... |
 | Cache Level | 1 |
@@ -141,7 +175,14 @@ Level 2: Full document        (on demand)    - fetched when Level 1 insufficient
 
 ### 6. Report Status
 ```
-✓ Jarvis ready for [Project Name]
+       ██╗    █████╗     ██████╗     ██╗   ██╗    ██╗    ███████╗
+       ██║   ██╔══██╗    ██╔══██╗    ██║   ██║    ██║    ██╔════╝
+       ██║   ███████║    ██████╔╝    ██║   ██║    ██║    ███████╗
+  ██   ██║   ██╔══██║    ██╔══██╗    ╚██╗ ██╔╝    ██║    ╚════██║
+  ╚█████╔╝   ██║  ██║    ██║  ██║     ╚████╔╝     ██║    ███████║
+   ╚════╝    ╚═╝  ╚═╝    ╚═╝  ╚═╝      ╚═══╝      ╚═╝    ╚══════╝
+
+✓ Ready for [Project Name]
 
 Memory loaded:
 • User profile: [X] preferences
@@ -183,6 +224,30 @@ Use templates from `~/.claude/jarvis/templates/`:
 - `task-brief-prfaq-review.md`
 - `task-brief-multi-perspective.md`
 
+### Thinking Levels for Subagents
+
+Use extended thinking when tasks require deeper reasoning:
+
+| Task Type | Thinking Level | When to Use |
+|-----------|----------------|-------------|
+| Quick review | Default | Routine checks, simple validations |
+| PRD review | `think hard` | Technical feasibility, dependency analysis |
+| PRFAQ review | `think hard` | Strategic alignment, market positioning |
+| Architecture decisions | `ultrathink` | Complex trade-offs, multi-system impact |
+| Pre-mortem / Devil's Advocate | `ultrathink` | Finding non-obvious failure modes |
+| Strategy documents | `ultrathink` | Long-term implications, competitive dynamics |
+
+**How to specify in Task Brief:**
+```markdown
+## Thinking Level
+Use extended thinking ("think hard") for this review.
+```
+
+**Example escalation:**
+- First pass: Default thinking → Surface issues found
+- Resume with demands: "think harder" → Deeper analysis
+- Complex decisions: "ultrathink" → Comprehensive reasoning
+
 ### Acceptance Criteria
 
 **Accept subagent output when:**
@@ -215,21 +280,23 @@ Save subagent outputs to:
 
 For ANY factual claim:
 
-1. **Check Level 1 cache** → `drive-docs/*.md` summaries
+1. **Check Level 1 cache** → `drive-docs/*.md` AND `notion-pages/*.md` summaries
 2. **Validate freshness** → Compare `lastModified` with source (see below)
-3. **If need more detail** → Hydrate to Level 2 (fetch full doc)
+3. **If need more detail** → Hydrate to Level 2 (fetch full doc/page)
 4. **Search Notion** → Exact keyword first, then semantic
 5. **Search Drive** → MCP document search
 6. **If not found** → "I don't have a source for this"
 
 ### Validate-Before-Cite (Option C Freshness)
 
-**Before citing any cached document, validate it's still current:**
+**Before citing any cached document or Notion page, validate it's still current:**
 
 ```
-About to cite cached doc
+About to cite cached doc/page
          ↓
-Call Drive API: get file metadata (modifiedTime only)
+Call source API: get metadata (lastEditedTime/modifiedTime only)
+  - Drive: get file metadata
+  - Notion: notion-fetch (metadata is in response)
          ↓
 Compare: cached lastModified vs current lastModified
          ↓
@@ -237,7 +304,7 @@ Compare: cached lastModified vs current lastModified
          ↓
          Different? → Refresh cache first
                       ↓
-                      Re-fetch document
+                      Re-fetch document/page
                       ↓
                       Update Level 1 summary
                       ↓
@@ -254,7 +321,7 @@ Compare: cached lastModified vs current lastModified
 
 **Implementation:**
 ```python
-# Pseudocode for validate-before-cite
+# Pseudocode for validate-before-cite (Drive)
 def cite_cached_doc(doc_id):
     cached = read_index_json(doc_id)
     current = drive_api.get_file_metadata(doc_id)  # modifiedTime only
@@ -264,10 +331,21 @@ def cite_cached_doc(doc_id):
         refresh_cache(doc_id)
 
     return cached_content()
+
+# Pseudocode for validate-before-cite (Notion)
+def cite_cached_notion_page(page_id):
+    cached = read_index_json(page_id)
+    current = notion_api.fetch_page(page_id)  # lastEditedTime in response
+
+    if current.lastEditedTime != cached.lastModified:
+        # Stale! Refresh first
+        refresh_notion_cache(page_id)
+
+    return cached_content()
 ```
 
 **When to validate:**
-- ALWAYS before citing a cached doc in an answer
+- ALWAYS before citing a cached doc/page in an answer
 - NOT needed for quick metadata lookups (title, size)
 - NOT needed during brainstorming (no factual claims)
 
@@ -303,7 +381,7 @@ When asked about something not in cache:
 
 | Command | Action |
 |---------|--------|
-| `/jarvis` | Activate/re-activate |
+| `/jarvis` | Activate/re-activate (runs auto-cleanup) |
 | `jarvis status` | Show cached docs, metrics |
 | `jarvis events` | Show recent events (last 7 days) |
 | `jarvis events --all` | Show all events for current project |
@@ -317,6 +395,41 @@ When asked about something not in cache:
 | `refresh cache for [doc]` | Re-fetch document |
 | `jarvis clear cache` | Remove project cache |
 | `jarvis forget [project]` | Clear project entirely |
+| `jarvis cleanup` | Run retention policy (90d analysis, 30d notes, 90d events) |
+| `jarvis cleanup --dry-run` | Preview what would be cleaned |
+| `summarize session` | Auto-generate session summary (decisions, blockers, next steps) |
+
+---
+
+## Steering Wheel Refinement
+
+Adjust output dimensions on-the-fly with these commands:
+
+| Command | Effect |
+|---------|--------|
+| "make it more concrete" | Grounding → Concrete |
+| "make it bolder" | Risk → Bold |
+| "expand on this" | Scope → Expansive |
+| "simplify" | Style → Clear, Scope → Focused |
+| "make it punchier" | Style → Compelling |
+| "more exploratory" | Certainty → Exploratory |
+| "lock it in" | Certainty → Definitive |
+| "be more conservative" | Risk → Safe |
+| "try something different" | Originality → Novel |
+| "stick to what works" | Originality → Proven |
+| "give me the big picture" | Grounding → Abstract, Scope → Expansive |
+| "get specific" | Grounding → Concrete, Scope → Focused |
+
+### Presets (Shortcuts)
+
+| Preset | Trigger Phrases | Settings Applied |
+|--------|-----------------|------------------|
+| **Brainstorm Mode** | "let's brainstorm", "help me think" | Exploratory, Novel, Abstract, Bold, Expansive, Compelling |
+| **Final Draft** | "finalize", "polish this", "lock it in" | Definitive, Proven, Concrete, Safe, Focused, Clear |
+| **Strategy Mode** | "strategy", "big picture" | Exploratory, Novel, Abstract, Bold, Expansive, Compelling |
+| **Execution Mode** | "tactical", "action items", "next steps" | Definitive, Proven, Concrete, Safe, Focused, Clear |
+
+See `~/.claude/jarvis/skill/steering-wheel.md` for full details.
 
 ---
 
@@ -388,7 +501,47 @@ At end of session (or when user says "add today's notes"), write to `memory/dail
 - [Follow-ups needed]
 ```
 
-**Retention:** Keep last 30 days, auto-prune older notes.
+**Retention:** Keep last 30 days, auto-archive older notes to `daily-notes/archive/`.
+
+### Session Summary Auto-Generation (NEW)
+
+**Trigger:** End of significant work session, or explicit "summarize session"
+
+**Auto-extraction logic:**
+Jarvis scans conversation for:
+1. **Decisions** - Look for: "decided", "agreed", "we'll go with", "final answer"
+2. **Blockers** - Look for: "blocked", "waiting on", "need input from", "can't proceed"
+3. **Next steps** - Look for: "next", "tomorrow", "follow up", "action item"
+4. **Key outputs** - Files created, reviews completed, documents drafted
+
+**Auto-generated format:**
+```markdown
+# Session Summary - [Project] - YYYY-MM-DD
+
+## Decisions Made
+- [Auto-extracted decisions with context]
+
+## Blockers Identified
+- [Auto-extracted blockers with owners if mentioned]
+
+## Next Steps
+- [ ] [Auto-extracted action items]
+
+## Key Outputs
+- [Files created/modified]
+- [Reviews completed]
+
+## Raw Session Notes
+[Optional: user can add manual notes]
+```
+
+**Implementation:**
+When session ends or user says "summarize session":
+1. Scan conversation for trigger phrases
+2. Extract relevant statements with context
+3. Categorize into decisions/blockers/next-steps
+4. Write to `memory/daily-notes/YYYY-MM-DD.md`
+5. Also update `context/[project]/session-summary.md` for project continuity
 
 ### Session Event Log (session-log.jsonl)
 
@@ -443,9 +596,9 @@ Jarvis automatically detects and logs events during conversation based on trigge
 
 **Example Entries:**
 ```jsonl
-{"v":1,"ts":"2026-02-03T14:30:00Z","type":"decision","project":"my-project","content":"Agreed to use microservices architecture","tags":["architecture"]}
-{"v":1,"ts":"2026-02-03T15:00:00Z","type":"blocker","project":"my-project","content":"Need API contract from partner team","owner":"Partner Team"}
-{"v":1,"ts":"2026-02-03T15:30:00Z","type":"action","project":"my-project","content":"Draft technical spec","status":"done"}
+{"v":1,"ts":"2026-02-03T14:30:00Z","type":"decision","project":"support-workflow","content":"Agreed to restructure SLAs around ARR tiers","tags":["support","sla"]}
+{"v":1,"ts":"2026-02-03T15:00:00Z","type":"blocker","project":"support-workflow","content":"Need CS health score data in Zendesk","owner":"RevOps"}
+{"v":1,"ts":"2026-02-03T15:30:00Z","type":"action","project":"ai-onboarding","content":"Draft role-specific quick-start cards","status":"done"}
 ```
 
 ---
