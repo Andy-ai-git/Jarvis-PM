@@ -175,6 +175,17 @@ Long conversations accumulate noise. Jarvis stays effective through delegation:
 | Subagent analysis complete | `context/[project]/analysis-outputs/` |
 | Session ends | `memory/daily-notes/YYYY-MM-DD.md` |
 
+### Session Summary Auto-Generation
+
+At session end, say `summarize session` to auto-extract:
+
+- **Decisions Made** - Detected from "decided", "agreed", "we'll go with"
+- **Blockers Identified** - Detected from "blocked", "waiting on", "need input"
+- **Next Steps** - Detected from "next", "tomorrow", "action item"
+- **Key Outputs** - Files created, reviews completed
+
+Summaries save to both `daily-notes/` and project `session-summary.md`.
+
 **Example:**
 ```
 Day 1: "I prefer bullet points over paragraphs."
@@ -225,7 +236,8 @@ OR
 "I don't have a source for this — would you like me to search?"
 ```
 
-**Source Priority:**
+### Source Priority
+
 ```
 1. Check local cache (~/.claude/jarvis/context/[project]/)
 2. Validate cache freshness (API metadata check)
@@ -233,6 +245,37 @@ OR
 4. Search Google Drive (MCP document search)
 5. If not found → "I don't have a source for this"
 ```
+
+### Citation Format
+
+Every factual claim includes:
+- Source document name
+- Source location (Drive ID, Notion URL, or file path)
+- Confidence level when relevant
+
+**Example:**
+```
+The product launches September 2026.
+
+Source: Product PRFAQ v0.9 (Drive: 1yui3pnf...)
+Confidence: High - direct quote from document
+```
+
+### What Jarvis Will NOT Do
+
+- State facts without sources
+- Guess when uncertain
+- Fill gaps with plausible-sounding information
+- Cite outdated cached data without refreshing
+- Conflate similar concepts
+
+### What Jarvis Will Do
+
+- Say "I don't know" when appropriate
+- Offer to search for missing information
+- Mark assumptions explicitly
+- Validate cache before citing
+- Ask for clarification when needed
 
 ---
 
@@ -286,6 +329,47 @@ PRD Review (parallel):
 All return findings → Jarvis synthesizes → You get unified review
 ```
 
+### Subagent Output Format
+
+All subagents return structured synthesis (not raw data):
+
+```markdown
+## Summary (3 bullets max)
+- Key finding 1
+- Key finding 2
+- Key finding 3
+
+## Findings
+[Detailed analysis organized by category]
+
+## Recommendations
+[Prioritized, actionable next steps]
+
+## Risk Rating
+[Critical / High / Medium / Low] with rationale
+
+## Files Referenced
+[List of sources consulted]
+```
+
+### Subagent Invocation
+
+Jarvis sends a **Task Brief** to each subagent:
+
+```markdown
+## Objective
+[Specific task to accomplish]
+
+## Files to Read
+[Explicit file paths - subagent reads these directly]
+
+## Context
+[2-3 sentence background - no more]
+
+## Output Format
+[Expected structure for response]
+```
+
 ### Extended Thinking for Subagents
 
 Use extended thinking when tasks require deeper reasoning:
@@ -298,6 +382,19 @@ Use extended thinking when tasks require deeper reasoning:
 | Architecture decisions | `ultrathink` | Complex trade-offs, multi-system impact |
 | Pre-mortem / Devil's Advocate | `ultrathink` | Finding non-obvious failure modes |
 | Strategy documents | `ultrathink` | Long-term implications, competitive dynamics |
+
+### Iterative Refinement
+
+When subagent output is insufficient:
+
+| Scenario | Action |
+|----------|--------|
+| Output direction right, needs depth | **Resume** same agent with specific demands |
+| Missing info, needs expansion | **Resume** with expanded scope |
+| Wrong angle, needs redirect | **Resume** with new focus |
+| Fundamentally wrong approach | **Restart** with better instructions |
+
+**Circuit breaker:** 3 resume attempts, then escalate to user.
 
 ---
 
