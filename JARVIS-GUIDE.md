@@ -1,6 +1,6 @@
 # Jarvis OS - User Guide
-**Version:** 2.1
-**Updated:** 2026-01-23
+**Version:** 3.0
+**Updated:** 2026-02-13
 
 ## Quick Start
 
@@ -79,8 +79,9 @@ Say these phrases and Jarvis spawns subagents automatically:
 | "review strategy" | Executive + CTO |
 | "pre-mortem" | Devil's Advocate |
 | "write post/update" | Comms |
+| "assess this prompt" | Prompt Assessor |
 
-### Subagent Focus Areas (12 Specialists)
+### Subagent Focus Areas (14 Specialists)
 
 | Agent | Focus |
 |-------|-------|
@@ -96,6 +97,8 @@ Say these phrases and Jarvis spawns subagents automatically:
 | **Devil's Advocate** | Find flaws, attack assumptions |
 | **Marketer** | Positioning, GTM, launch |
 | **Comms** | Writing in your voice, updates |
+| **Research Papers** | AI research trends, paper summaries |
+| **Prompt Assessor** | Prompt analysis, anti-pattern detection |
 
 ---
 
@@ -174,11 +177,19 @@ Before citing any cached doc, Jarvis automatically:
 │       ├── drive-docs/        # Level 1 cache
 │       └── analysis-outputs/  # Subagent reviews
 │
-├── subagents/                  # 12 specialist agents
+├── subagents/                  # 14 specialist agents
 │   ├── executive/SKILL.md
 │   ├── cto/SKILL.md
 │   ├── backend-engineer/SKILL.md
-│   └── ... (12 total)
+│   ├── prompt-assessor/SKILL.md
+│   ├── research-papers/SKILL.md
+│   └── ... (14 total)
+│
+├── skills/                    # Writing methodology skills
+│   ├── prd-writing/SKILL.md
+│   ├── prfaq-writing/SKILL.md
+│   ├── strategy-doc/SKILL.md
+│   └── stakeholder-update/SKILL.md
 │
 ├── templates/                  # Task briefs
 ├── skill/SKILL.md             # Activation skill
@@ -249,4 +260,4 @@ add today's notes
 
 ---
 
-*Jarvis OS v2.1 - Your personal PM operating system*
+*Jarvis OS v3.0 - Your personal PM operating system*

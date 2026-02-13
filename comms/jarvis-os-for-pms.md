@@ -74,7 +74,7 @@ It solves three problems:
 - "My company does..." (repeat background)
 
 **After:**
-- "What's the status of RTT migration?"
+- "What's the status of platform migration?"
 - Jarvis already knows. Answers with citation.
 
 ---
@@ -93,7 +93,7 @@ It solves three problems:
 **Jarvis:**
 > "Q2 2026, with feature parity as the core principle."
 >
-> *Source: RTT Migration PRD v0.6, Section 2.1*
+> *Source: Platform Migration PRD v0.6, Section 2.1*
 > *Confidence: High — direct quote*
 
 Or when it doesn't know:

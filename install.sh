@@ -81,6 +81,24 @@ if [ -d "$JARVIS_DIR/templates" ]; then
   done
 fi
 
+# Set up writing skills
+echo "→ Setting up writing skills..."
+SKILLS_DIR="$HOME/.claude/skills"
+for skill in prd-writing prfaq-writing strategy-doc stakeholder-update; do
+  skill_dir="$SKILLS_DIR/$skill"
+  if [ -d "$JARVIS_DIR/skills/$skill" ]; then
+    mkdir -p "$skill_dir"
+    cp "$JARVIS_DIR/skills/$skill/SKILL.md" "$skill_dir/SKILL.md"
+    echo "✓ Installed $skill skill"
+  fi
+done
+
+# Set up mental models template
+if [ ! -f "$JARVIS_DIR/memory/mental-models.md" ] && [ -f "$JARVIS_DIR/templates/mental-models.md" ]; then
+  cp "$JARVIS_DIR/templates/mental-models.md" "$JARVIS_DIR/memory/mental-models.md"
+  echo "✓ Created mental-models.md"
+fi
+
 # Create learnings.md if it doesn't exist
 if [ ! -f "$JARVIS_DIR/memory/learnings.md" ]; then
   cat > "$JARVIS_DIR/memory/learnings.md" << 'EOF'

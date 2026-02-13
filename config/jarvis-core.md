@@ -54,8 +54,8 @@ Priority order:
 # Jarvis Project Configuration
 
 ## Critical Documents (Auto-cache on session start)
-- [RTT Migration PRD](drive-id)
-- [Agent Copilot PRFAQ](drive-id)
+- [Product Roadmap Q1](drive-id)
+- [Feature Launch PRFAQ](drive-id)
 
 ## Key Notion Pages
 - Product Wiki: [URL]
@@ -142,7 +142,7 @@ Auto-delegation triggers:
 ## Skills
 Document templates enforced:
 - **/prfaq** - Amazon-style PR/FAQ
-- **/prd** - PRD format
+- **/prd** - Standard PRD format
 - **/strategy** - Rumelt's Strategy Kernel
 
 ## Token Efficiency

@@ -2,7 +2,7 @@
 
 **Version:** 2.1
 **Date:** 2026-01-23
-**Author:** Jarvis OS
+**Author:** Jarvis (with Andrey)
 
 ---
 
@@ -109,17 +109,17 @@ Jarvis OS is a personal PM operating system that provides:
   - Terminology preferences
 
 - **learnings.md** - Decision patterns and correction log
-  - How the user approaches problems
+  - How Andrey approaches problems
   - Red flags that trigger pushback
   - Preferences discovered
   - Effective approaches to replicate
   - Anti-patterns to avoid
 
-- **cross-project-knowledge.md** - Company-wide context
-  - What the company does and its market positioning
-  - Strategic themes and key initiatives
-  - Industry metrics and KPIs
-  - Active projects and status
+- **cross-project-knowledge.md** - Company context
+  - What the company does (core business)
+  - Strategic themes (data flywheel, deployment modes)
+  - Industry metrics (AHT, FCR, CSAT)
+  - Active projects (Smart Assistant, Platform Migration)
   - Key stakeholders
 
 #### Subagent Skill Files Created
@@ -150,7 +150,7 @@ Jarvis OS is a personal PM operating system that provides:
 - **task-brief-multi-perspective.md**
 
 #### Project Configuration
-- Created `.jarvis.md` for project configuration
+- Created `.jarvis.md` in Smart Assistant project
 - Registered 3 critical documents with Drive IDs
 
 ### Phase 2: Proactive Caching
@@ -159,8 +159,8 @@ Jarvis OS is a personal PM operating system that provides:
 - Fetched 3 critical documents from Google Drive
 - Created Level 1 summaries with metadata and key facts:
   - `agent-copilot-prfaq.md`
-  - `rtt-migration-prd.md`
-  - `rtt-dependencies.md`
+  - `platform-migration-prd.md`
+  - `migration-dependencies.md`
 
 #### Cache Index Updated
 - `index.json` now tracks cache levels and metrics

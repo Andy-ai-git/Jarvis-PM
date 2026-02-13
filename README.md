@@ -2,12 +2,12 @@
 
 [![Claude Code](https://img.shields.io/badge/Claude_Code-Compatible-blueviolet)](https://claude.ai/claude-code)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Subagents](https://img.shields.io/badge/Subagents-13-blue)]()
+[![Subagents](https://img.shields.io/badge/Subagents-14-blue)]()
 [![Memory](https://img.shields.io/badge/Memory-Persistent-orange)]()
 
 **Your personal AI operating system for Product Management.**
 
-Jarvis transforms Claude Code into an intellectual sparring partner with persistent memory, document caching, source-grounded answers, and 13 specialist AI reviewers on demand. It challenges your thinking instead of agreeing with everything, remembers across sessions, and never states facts without sources.
+Jarvis transforms Claude Code into an intellectual sparring partner with persistent memory, document caching, source-grounded answers, and 14 specialist AI reviewers on demand. It challenges your thinking instead of agreeing with everything, remembers across sessions, and never states facts without sources.
 
 ```
        ██╗    █████╗     ██████╗     ██╗   ██╗    ██╗    ███████╗
@@ -29,7 +29,7 @@ Claude is powerful, but every conversation starts from zero. You repeat context,
 | Claude forgets everything between sessions | 3-layer persistent memory |
 | Claude agrees too easily | Sparring partner mode challenges your thinking |
 | Claude makes confident claims without evidence | Source-grounded answers with citations |
-| Reviews require manual prompting | 13 specialist reviewers auto-invoked |
+| Reviews require manual prompting | 14 specialist reviewers auto-invoked |
 | Uploading docs burns tokens | Tiered document cache (~90-98% savings) |
 | Long conversations degrade quality | Anti-context-rot architecture |
 | Generic, impersonal responses | Learns your voice, preferences, and domain |
@@ -279,9 +279,9 @@ Confidence: High - direct quote from document
 
 ---
 
-### 4. 13 Specialist Sub-Agents
+### 4. 14 Specialist Sub-Agents
 
-Jarvis delegates specialized work to 13 subagents. Each operates in isolated context and returns structured synthesis.
+Jarvis delegates specialized work to 14 subagents. Each operates in isolated context and returns structured synthesis.
 
 | Agent | Expertise | Invoked For |
 |-------|-----------|-------------|
@@ -298,6 +298,7 @@ Jarvis delegates specialized work to 13 subagents. Each operates in isolated con
 | **Marketer** | Positioning, GTM, messaging, differentiation | Launch plans, messaging, competitive analysis |
 | **Comms** | Writing in user's voice, stakeholder updates | LinkedIn posts, blog drafts, status updates |
 | **Research Papers** | AI research trends, PM-focused paper summaries | "What's new in AI?", research context for decisions |
+| **Prompt Assessor** | Prompt analysis, evidence-backed audit, anti-pattern detection | Prompt quality review, system prompt optimization |
 
 ### Auto-Delegation Triggers
 
@@ -313,6 +314,7 @@ When you say these phrases, Jarvis spawns subagents automatically:
 | "draft LinkedIn post" | Comms | Content in your voice |
 | "launch plan" | Marketer + Executive | GTM + stakeholder strategy |
 | "what's new in AI?" | Research Papers | PM-focused paper summaries |
+| "assess this prompt" | Prompt Assessor | Evidence-backed prompt audit |
 
 ### Parallel Execution
 
@@ -692,9 +694,19 @@ Verdict: PROCEED WITH CAUTION
 │   ├── devils-advocate/SKILL.md
 │   ├── marketer/SKILL.md
 │   ├── comms/SKILL.md
-│   └── research-papers/             # AI research trends
+│   ├── research-papers/             # AI research trends
+│   │   ├── SKILL.md
+│   │   └── fetch-papers.sh          # arxiv + Semantic Scholar fetcher
+│   │
+│   └── prompt-assessor/             # Prompt quality analysis
 │       ├── SKILL.md
-│       └── fetch-papers.sh          # arxiv + Semantic Scholar fetcher
+│       └── research-library.md      # 13 papers + 4 provider guides
+│
+├── skills/                         # Writing methodology skills (public)
+│   ├── prd-writing/SKILL.md       # Structured PRD methodology
+│   ├── prfaq-writing/SKILL.md     # Amazon-style PR/FAQ format
+│   ├── strategy-doc/SKILL.md      # Rumelt's Strategy Kernel
+│   └── stakeholder-update/SKILL.md # Executive update format
 │
 ├── templates/                       # Reusable templates (public)
 │   ├── user-profile-template.md
@@ -703,7 +715,9 @@ Verdict: PROCEED WITH CAUTION
 │   ├── jarvis-project-template.md
 │   ├── task-brief-prd-review.md
 │   ├── task-brief-prfaq-review.md
-│   └── task-brief-multi-perspective.md
+│   ├── task-brief-multi-perspective.md
+│   ├── mental-models.md
+│   └── task-brief-prompt-assessment.md
 │
 ├── config/jarvis-core.md            # Core configuration
 ├── skill/
@@ -786,6 +800,7 @@ How to assess severity.
 | [Jarvis Guide](JARVIS-GUIDE.md) | Comprehensive user guide |
 | [Skill Registration](docs/SKILL-REGISTRATION.md) | How Claude Code discovers Jarvis |
 | [Customization](docs/CUSTOMIZATION.md) | Expand your profile over time |
+| [Skills](skills/) | Writing methodology templates |
 | [Troubleshooting](docs/TROUBLESHOOTING.md) | Common issues and fixes |
 
 ---
@@ -821,6 +836,7 @@ MIT License — see [LICENSE](LICENSE)
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 3.0 | 2026-02-13 | Prompt Assessor subagent (14 total), writing skills (PRD, PRFAQ, Strategy, Updates), mental models framework, research library (13 papers + 4 provider guides) |
 | 2.3 | 2026-02-03 | Research Papers subagent (13 total), AI trends on demand |
 | 2.2 | 2026-01-23 | Notion caching, auto-cleanup policy, session summary auto-generation |
 | 2.1 | 2026-01-23 | 12 subagents, explicit grounding rules, anti-context-rot docs |
