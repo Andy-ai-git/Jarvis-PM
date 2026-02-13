@@ -122,56 +122,9 @@ For each page in Key Notion Pages table:
    - Save to `notion-pages/[page-name].md`
    - Update `index.json` status
 
-**Notion Cache File Format:**
-```markdown
-# [Page Title] - Cached Summary
+**Cache Levels:** L0 = metadata (~50 tokens), L1 = key facts (~500 tokens), L2 = full doc (on demand). ~90% token savings vs full docs.
 
-## Metadata (Level 0)
-| Field | Value |
-|-------|-------|
-| Page ID | `...` |
-| URL | `...` |
-| Last Modified | ... |
-| Cache Level | 1 |
-
-## Key Facts (Level 1 Summary)
-- [Extracted key facts]
-- [Quick answers]
-
----
-*To fetch full page: Use Notion ID `...`*
-```
-
-**Tiered Cache Levels:**
-```
-Level 0: Metadata only        (~50 tokens)   - title, date, size, ID
-Level 1: Key facts summary    (~500 tokens)  - extracted insights, quick answers
-Level 2: Full document        (on demand)    - fetched when Level 1 insufficient
-```
-
-**Cache File Format (Drive):**
-```markdown
-# [Document Title] - Cached Summary
-
-## Metadata (Level 0)
-| Field | Value |
-|-------|-------|
-| Document ID | `...` |
-| Last Modified | ... |
-| Cache Level | 1 |
-
-## Key Facts (Level 1 Summary)
-- [Extracted key facts]
-- [Quick answers]
-
----
-*To fetch full document: Use Drive ID `...`*
-```
-
-**Token Savings:**
-- Full docs: ~40,000 tokens (for 160KB)
-- Level 1 summaries: ~3,750 tokens
-- **Savings: ~90%**
+See `references/cache-formats.md` for file templates (Notion + Drive) and token math.
 
 ### 6. Report Status
 ```
@@ -489,190 +442,32 @@ See `~/.claude/jarvis/skill/steering-wheel.md` for full details.
 
 ## Persistence Protocol (MANDATORY)
 
-Previous sessions were lost because persistence relied on Jarvis "remembering" to write at session end. This is the same P^N decay problem we diagnose in prompt assessments — behavioral rules get dropped. The fix: persistence is a **mandatory side-effect** of specific actions, not a separate step.
+Persistence is a **mandatory side-effect** of actions, not a separate step. 4 strict rules:
 
-### Rule 1: Log Events Inline (STRICT)
+1. **Log events inline** — Decisions, blockers, actions → append `session-log.jsonl` same turn. Not later.
+2. **Auto-cache on fetch** — Any MCP doc fetch → save to project context immediately. No fetch without cache.
+3. **Register project on activation** — Every `/jarvis` → update `index.json` with slug, path, timestamp.
+4. **Incremental session summary** — Major deliverable completed → append daily note + session summary.
 
-After any response that contains a decision, blocker, action item, or milestone → **MUST append to `session-log.jsonl` in the same tool-call batch.**
+**Deterministic validation:** Run `scripts/validate-persistence.sh [project-slug]` to verify all artifacts exist.
 
-Not later. Not at end of session. Not "I'll log it when we wrap up." Same turn.
+**Stop Hook:** Structural enforcement at session exit — checks daily note, session summary, session log. Requires `.session-active` flag from Step 3b.
 
-```
-User says "let's go with option B"
-  → Jarvis responds with analysis
-  → IN THE SAME RESPONSE: Bash append to session-log.jsonl
-```
-
-### Rule 2: Auto-Cache on Fetch (STRICT)
-
-Any document fetched via MCP (Drive `gdrive_fetch`, Notion `notion-fetch`) → **MUST be saved to project context immediately.**
-
-- Drive docs → `context/[project]/drive-docs/[doc-name].md`
-- Notion pages → `context/[project]/notion-pages/[page-name].md`
-- Sub-agents that fetch docs → MUST return cache-worthy content in their output
-- Minimum: Level 0 metadata (title, ID, lastModified, URL)
-- Preferred: Level 1 summary (key facts, ~500 tokens)
-
-**No fetch without cache. No exceptions.**
-
-### Rule 3: Register Project on Activation (STRICT)
-
-Every `/jarvis` activation → **MUST update `index.json`** with:
-- Project slug, path, `lastAccessed` timestamp
-- Create project directory structure if it doesn't exist
-- Even if the project already exists (update `lastAccessed`)
-
-### Rule 4: Incremental Session Summary (STRICT)
-
-After completing a major deliverable → **MUST append to both:**
-- `memory/daily-notes/YYYY-MM-DD.md`
-- `context/[project]/session-summary.md`
-
-Major deliverables include: document created/edited, review completed, analysis delivered, research synthesized.
-
-End-of-session summary is a **backup**, not the primary mechanism. If all inline writes happened correctly, the end-of-session summary just confirms what's already recorded.
-
-### Persistence Self-Check
-
-Before ending a conversation turn that produced substantive work:
-
-```
-1. ☐ Any decisions/blockers/actions? → Logged to session-log.jsonl?
-2. ☐ Any documents fetched via MCP? → Cached to project context?
-3. ☐ Major deliverable completed? → Daily note + session summary updated?
-4. ☐ New project detected? → Registered in index.json?
-```
-
-If ANY box is unchecked, **do the write before responding to the user.**
-
-### Why This Works
-
-- Persistence is a side-effect of actions, not a separate step to remember
-- Each write is small (~100-500 tokens) — minimal context cost
-- Worst case if a session ends abruptly: only the LAST turn is lost, not the entire session
-- Eliminates the P^N problem: 4 structural rules > 50 behavioral "remember to save" rules
+See `references/persistence-protocol.md` for full rules, self-check checklist, and Stop Hook details.
 
 ---
 
-### Daily Notes Format
+### Daily Notes & Session Summaries
 
-At end of session (or when user says "add today's notes"), write to `memory/daily-notes/YYYY-MM-DD.md`:
+Write daily notes to `memory/daily-notes/YYYY-MM-DD.md`. Auto-generate session summaries on "summarize session" or session end. Retention: 30 days active, then archive.
 
-```markdown
-# Daily Notes - YYYY-MM-DD
-
-## Session Summary
-### What We Worked On
-- [Key accomplishments]
-- [Decisions made]
-
-### Project: [Name]
-- [Project-specific context]
-
-### Open Items
-- [Pending tasks]
-- [Follow-ups needed]
-```
-
-**Retention:** Keep last 30 days, auto-archive older notes to `daily-notes/archive/`.
-
-### Session Summary Auto-Generation (NEW)
-
-**Trigger:** End of significant work session, or explicit "summarize session"
-
-**Auto-extraction logic:**
-Jarvis scans conversation for:
-1. **Decisions** - Look for: "decided", "agreed", "we'll go with", "final answer"
-2. **Blockers** - Look for: "blocked", "waiting on", "need input from", "can't proceed"
-3. **Next steps** - Look for: "next", "tomorrow", "follow up", "action item"
-4. **Key outputs** - Files created, reviews completed, documents drafted
-
-**Auto-generated format:**
-```markdown
-# Session Summary - [Project] - YYYY-MM-DD
-
-## Decisions Made
-- [Auto-extracted decisions with context]
-
-## Blockers Identified
-- [Auto-extracted blockers with owners if mentioned]
-
-## Next Steps
-- [ ] [Auto-extracted action items]
-
-## Key Outputs
-- [Files created/modified]
-- [Reviews completed]
-
-## Raw Session Notes
-[Optional: user can add manual notes]
-```
-
-**Implementation:**
-When session ends or user says "summarize session":
-1. Scan conversation for trigger phrases
-2. Extract relevant statements with context
-3. Categorize into decisions/blockers/next-steps
-4. Write to `memory/daily-notes/YYYY-MM-DD.md`
-5. Also update `context/[project]/session-summary.md` for project continuity
+See `references/daily-notes-format.md` for templates, auto-extraction triggers, and format specs.
 
 ### Session Event Log (session-log.jsonl)
 
-Structured event log for machine-readable persistence across sessions. JSONL format (one event per line).
+JSONL event log with 7 types: decision, blocker, action, learning, insight, milestone, context. Auto-extracted from conversation. Manual: `jarvis log [type]: [text]`. Load last 7 days on activation (max 20 events, ~500-1000 tokens). Retention: 90 days active, quarterly archive.
 
-**Schema (v1):**
-```json
-{
-  "v": 1,
-  "ts": "ISO8601 timestamp",
-  "type": "decision|blocker|action|learning|insight|milestone|context",
-  "project": "project-slug or null (cross-project)",
-  "content": "Event description",
-  "context": "Optional reasoning/background",
-  "owner": "For blockers/actions: person responsible",
-  "status": "For actions: pending|done|cancelled",
-  "tags": ["optional", "categorization", "tags"]
-}
-```
-
-**Event Types:**
-
-| Type | Description | Auto-Extract Triggers |
-|------|-------------|----------------------|
-| `decision` | A choice was made | "decided", "agreed", "we'll go with", "final answer" |
-| `blocker` | Something blocking progress | "blocked", "waiting on", "need input from", "can't proceed" |
-| `action` | Follow-up task identified | "need to", "TODO", "follow up", "next step", "tomorrow" |
-| `learning` | Reusable knowledge gained | "actually", "turns out", "TIL", "learned that" |
-| `insight` | Non-obvious observation | "hypothesis", "noticed", "pattern", "interesting" |
-| `milestone` | Significant completion | "done", "shipped", "completed", "launched" |
-| `context` | Important background info | Explicit "for context", "background", "FYI" |
-
-**Auto-Extraction:**
-Jarvis automatically detects and logs events during conversation based on trigger phrases. Events are written immediately when detected.
-
-**Manual Commands:**
-- `jarvis log decision: [text]` - Force-write decision event
-- `jarvis log blocker: [text]` - Force-write blocker event
-- `jarvis log action: [text]` - Force-write action event
-- `jarvis log insight: [text]` - Force-write insight event
-
-**Loading (On Activation):**
-- Load last 7 days of events
-- Filter to: decisions, blockers, pending actions
-- Max 20 events to stay context-efficient
-- Estimated cost: ~500-1000 tokens
-
-**Retention:**
-- Active: 90 days in `session-log.jsonl`
-- Archive: Quarterly files in `session-log-archive/` (e.g., `2026-Q1.jsonl`)
-- Auto-cleanup on `/jarvis` activation
-
-**Example Entries:**
-```jsonl
-{"v":1,"ts":"2026-02-03T14:30:00Z","type":"decision","project":"support-workflow","content":"Agreed to restructure SLAs around ARR tiers","tags":["support","sla"]}
-{"v":1,"ts":"2026-02-03T15:00:00Z","type":"blocker","project":"support-workflow","content":"Need CS health score data in Zendesk","owner":"RevOps"}
-{"v":1,"ts":"2026-02-03T15:30:00Z","type":"action","project":"ai-onboarding","content":"Draft role-specific quick-start cards","status":"done"}
-```
+See `references/event-log-schema.md` for full schema (v1), event type definitions, auto-extract triggers, and examples.
 
 ---
 
